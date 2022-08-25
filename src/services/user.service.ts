@@ -39,6 +39,24 @@ export async function createUser(userInput: any) {
     }
 }
 
+export async function updateUserProfile(userId: string, profile: string) {
+    try {
+        const user = await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                profile_pic: profile
+            }
+        })
+        return user
+    } catch (error) {
+        console.log(error);
+        return null
+    }
+
+}
+
 export async function findUserByEmail(email: string) {
     try {
         const user = await prisma.user.findUnique({
@@ -69,46 +87,28 @@ export async function loginUser(email: string, password: string) {
 
 export async function sendNote(noteBody: NoteBody) {
     try {
+        const user = await findUserByEmail(noteBody.email)
 
+        if (!user) return null
 
         const noteType = await prisma.noteType.create({
             data: { name: Type[noteBody.type.toUpperCase() as (keyof typeof Type)] },
             select: { id: true }
         })
 
-        let userIds: string[] = []
-
-        for await (const email of noteBody.emails) {
-            const user = (await prisma.user.findUnique({ where: { email }, select: { id: true } }))
-            if (user) {
-                userIds.push(user.id)
-            }
-        }
-
-        if (!(userIds.length > 0)) return null
-
-
-        const notes = await prisma.note.createMany({
-            // data: {
-            //     title: noteBody.title,
-            //     body: noteBody.body,
-            //     userId: user.id,
-            //     noteTypeId: noteType.id,
-            //     user: {
-
-            //     }
-            // },
-            data: userIds.map(userId => ({
+        const note = await prisma.note.create({
+            data: {
                 title: noteBody.title,
                 body: noteBody.body,
-                userId,
+                userId: user.id,
                 noteTypeId: noteType.id,
-            }))
-
-
+            },
+            // include: {
+            //     noteType: true
+            // }
         })
 
-        return notes
+        return note
     } catch (error: any) {
         console.log(error.message)
         return null

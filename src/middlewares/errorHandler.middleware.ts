@@ -37,7 +37,7 @@ const sendErrorProd = (err: AppError, res: Response) => {
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
-    fs.removeSync(`${process.cwd()}\\public\\images\\temp`)
+    fs.emptyDirSync(`${process.cwd()}\\public\\images\\temp`)
     console.log({ err });
     if (process.env.NODE_ENV === 'development') {
         return sendErrorDev(err, res);

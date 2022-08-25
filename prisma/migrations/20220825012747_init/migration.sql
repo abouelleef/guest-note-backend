@@ -5,7 +5,7 @@ CREATE TYPE "Type" AS ENUM ('INVITATION', 'CONGRATS');
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "profile_pic" TEXT NOT NULL,
+    "profile_pic" TEXT NOT NULL DEFAULT 'default',
     "email" TEXT NOT NULL,
     "hashedPassword" TEXT NOT NULL,
 
@@ -20,6 +20,7 @@ CREATE TABLE "Note" (
     "createAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
     "noteTypeId" TEXT NOT NULL,
+    "media" TEXT,
 
     CONSTRAINT "Note_pkey" PRIMARY KEY ("id")
 );
@@ -28,7 +29,7 @@ CREATE TABLE "Note" (
 CREATE TABLE "NoteType" (
     "id" TEXT NOT NULL,
     "name" "Type" NOT NULL,
-    "disabled" BOOLEAN NOT NULL,
+    "disabled" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "NoteType_pkey" PRIMARY KEY ("id")
 );

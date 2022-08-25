@@ -21,7 +21,7 @@ export async function updateNoteMedia(id: string, media: string) {
 }
 
 
-export async function getAllNotes(user: any, { limit, page }: { limit?: number, page?: number }) {
+export async function getAllNotes(user: any, { limit, page, type }: { limit?: number, page?: number, type?: string }) {
     try {
         const notes = await prisma.note.findMany({
             include: {
@@ -34,7 +34,7 @@ export async function getAllNotes(user: any, { limit, page }: { limit?: number, 
             where: {
                 userId: user.id,
                 noteType: {
-                    disabled: false
+                    disabled: false,
                 }
             },
             skip: (page && limit) ? page * limit : undefined,
@@ -44,6 +44,32 @@ export async function getAllNotes(user: any, { limit, page }: { limit?: number, 
         return notes
     } catch (error: any) {
         console.log(error.message)
+        return null
+    }
+
+}
+
+export async function deletNote(noteId: string) {
+
+    try {
+
+        await prisma.note.update({
+            where: {
+                id: noteId
+            },
+            data: {
+                noteType: {
+                    update: {
+                        disabled: true
+                    }
+                }
+            }
+        })
+
+        return "deleted"
+
+    } catch (error) {
+        console.log(error)
         return null
     }
 

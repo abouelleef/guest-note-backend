@@ -13,9 +13,9 @@ export const noteValidation = [
     .isString()
     .withMessage("Note body can not be empty"),
 
-  body("email")
-    .isEmail()
-    .withMessage("reciever email must be a valid email"),
+  // body("email")
+  //   .isEmail()
+  //   .withMessage("reciever email must be a valid email"),
 
   body("type")
     .custom((value: string, { req }) => {

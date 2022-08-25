@@ -7,11 +7,12 @@ import rateLimit from 'express-rate-limit';
 import AppError from './utils/appError';
 import globalErrorHandler from './middlewares/errorHandler.middleware';
 import indexRouter from './routes';
+import { corsOptions } from './config/corsOptions';
 
 const app = express();
 
 // GLOBAL MIDDLEWARES
-app.use(cors()); // Access-Control-Allow-Origin
+app.use(cors(corsOptions)); // Access-Control-Allow-Origin
 
 app.use(helmet()); // Set security HTTP headers
 app.use(helmet.xssFilter()); // XSS-Protection

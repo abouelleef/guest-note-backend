@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Note" ALTER COLUMN "media" DROP NOT NULL;
