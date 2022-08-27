@@ -103,9 +103,15 @@ export async function sendNote(noteBody: NoteBody) {
                 userId: user.id,
                 noteTypeId: noteType.id,
             },
-            // include: {
-            //     noteType: true
-            // }
+
+            include: {
+
+                user: {
+                    select: {
+                        subscription: true
+                    }
+                }
+            }
         })
 
         return note
@@ -113,4 +119,41 @@ export async function sendNote(noteBody: NoteBody) {
         console.log(error.message)
         return null
     }
+}
+
+
+export async function updateSubscription(subscription: string, userId: string) {
+
+    try {
+
+        let user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        })
+
+        if (!user) { return "No user found" }
+
+        if (user.subscription !== "" && user.subscription !== subscription) {
+            user = await prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    subscription
+                }
+            })
+
+            return "Subscribed"
+
+        }
+
+        return "user already subscribed"
+
+
+    } catch (error) {
+        console.log(error);
+        return null
+    }
+
 }

@@ -2,7 +2,7 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY!;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN!;
 const JWT_COOKIE_EXPIRES_IN = process.env.JWT_COOKIE_EXPIRES_IN!;
 const WEB_PUSH_PUBLIC_KEY = process.env.WEB_PUSH_PUBLIC_KEY!;
-const WEB_PUSH_PRAIVATE_KEY = process.env.WEB_PUSH_PRAIVATE_KEY!;
+const WEB_PUSH_PRIVATE_KEY = process.env.WEB_PUSH_PRIVATE_KEY!;
 const WEB_PUSH_EMAIL = process.env.WEB_PUSH_EMAIL!;
 
 export {
@@ -10,6 +10,6 @@ export {
     JWT_EXPIRES_IN,
     JWT_COOKIE_EXPIRES_IN,
     WEB_PUSH_PUBLIC_KEY,
-    WEB_PUSH_PRAIVATE_KEY,
+    WEB_PUSH_PRIVATE_KEY,
     WEB_PUSH_EMAIL
 }

@@ -1,12 +1,25 @@
 import asyncHandler from 'express-async-handler'
-import { createUser, loginUser, sendNote, updateUserProfile } from '../services/user.service'
+import { createUser, loginUser, sendNote, updateSubscription, updateUserProfile } from '../services/user.service'
 import AppError from '../utils/appError'
 import { StatusCodes } from 'http-status-codes';
 import { CustomRequest } from '../middlewares/protect.middleware';
 import fs from "fs-extra"
 import { updateNoteMedia, getAllNotes, deletNote } from '../services/notes.service';
-import webpush from "../config/webPushConfig"
-import { User } from '@prisma/client';
+// import webpush from "../config/webPushConfig"
+import { Note, User } from '@prisma/client';
+import webpush from "web-push"
+import { WEB_PUSH_EMAIL, WEB_PUSH_PRIVATE_KEY, WEB_PUSH_PUBLIC_KEY } from '../config/config'
+
+// const vapidKeys = {
+//     publicKey: WEB_PUSH_PUBLIC_KEY,
+//     privateKey: WEB_PUSH_PRAIVATE_KEY,
+// }
+
+webpush.setVapidDetails(
+    `mailto:${WEB_PUSH_EMAIL}`,
+    WEB_PUSH_PUBLIC_KEY,
+    WEB_PUSH_PRIVATE_KEY
+);
 
 export const registerUser = asyncHandler(async (req, res, next) => {
     let userWithToken = await createUser({ ...req.body })
@@ -66,13 +79,22 @@ export const sendNoteController = asyncHandler(async (req, res, next) => {
     let failedEmails: any[] = []
 
     for (const email of emails) {
-        let note = await sendNote({ title, body, email, type })
+        let note: any = await sendNote({ title, body, email, type })
         if (!note) {
             failedEmails.push(email)
             continue
         }
         //next(new AppError("Note can not be created", StatusCodes.BAD_REQUEST))
 
+        if (note.user.subscription) {
+            const payload = {
+                title: "You have a new note",
+                message: note.title.slice(0, 100) + "..."
+            }
+
+            webpush.sendNotification(JSON.parse(note.user.subscription), JSON.stringify(payload))
+
+        }
         console.log(req.files, "🎎🎎");
         if (req.files && req.files.length > 0) {
             console.log(req.files, "🎎🎎");
@@ -132,17 +154,21 @@ export const getAllNotesConteroller = asyncHandler(async (req: CustomRequest, re
     })
 })
 
-export const subscribeController = asyncHandler(async (req, res, next) => {
-    const subscription = req.body
+export const subscribeController = asyncHandler(async (req: CustomRequest, res, next) => {
 
-    const payload = JSON.stringify({ message: 'Your Push Payload Text' })
 
-    webpush.sendNotification(subscription, payload);
-    // if (!note) return next(new AppError(`Can not delete note ${noteId}`))
+    const subscription = JSON.stringify({ ...req.body })
+
+    let message = await updateSubscription(subscription, req.user?.id!)
+
+
+    if (message === null) {
+        message = "Error subscribing"
+    }
+
 
     res.status(StatusCodes.OK).json({
-        message: "Success",
-        // data: {  }
+        message
     })
 })
 
