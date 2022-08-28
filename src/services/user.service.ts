@@ -145,8 +145,9 @@ export async function updateSubscription(subscription: string, userId: string) {
         })
 
         if (!user) { return "No user found" }
+        console.log(user.subscription, "🎭🎭")
 
-        if (user.subscription !== "" && user.subscription !== subscription) {
+        if (user.subscription || user.subscription !== subscription) {
             user = await prisma.user.update({
                 where: {
                     id: userId

@@ -113,6 +113,7 @@ export const subscribeController = asyncHandler(async (req: CustomRequest, res, 
 
 
     const subscription = JSON.stringify({ ...req.body })
+    console.log(subscription)
 
     let message = await updateSubscription(subscription, req.user?.id!)
 
@@ -121,6 +122,7 @@ export const subscribeController = asyncHandler(async (req: CustomRequest, res, 
         message = "Error subscribing"
     }
 
+    console.log(message)
 
     res.status(StatusCodes.OK).json({
         message

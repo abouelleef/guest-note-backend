@@ -1,7 +1,7 @@
-// import { allowedOrigins } from './allowedOrigin';
+import { allowedOrigins } from './allowedOrigin';
 
 export const corsOptions = {
-  origin: "*",
+  origin: allowedOrigins,
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };

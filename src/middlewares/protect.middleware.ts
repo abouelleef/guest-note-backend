@@ -32,10 +32,15 @@ export const protect = asyncHandler(
 
     // Verify JWT
 
-    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET_KEY) as jwt.JwtPayload;
-    console.log(decoded);
+    try {
+      const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET_KEY) as jwt.JwtPayload;
+      // console.log(decoded);
+      req.user = { id: decoded.id, email: decoded.email };
 
-    req.user = { id: decoded.id, email: decoded.email };
+    } catch (error: any) {
+      // console.log(error)
+      next(new AppError(`Not Allowed: ${error.message}`, StatusCodes.FORBIDDEN))
+    }
 
     next();
   }
