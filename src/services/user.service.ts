@@ -2,14 +2,16 @@ import prisma from "../utils/prisma";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import {
-    JWT_SECRET_KEY,
-    JWT_EXPIRES_IN,
+    ACCESS_TOKEN_EXPIRES_IN,
+    ACCESS_TOKEN_SECRET_KEY,
+    REFRESH_TOKEN_EXPIRES_IN,
+    REFRESH_TOKEN_SECRET_KEY,
 } from "../config/config"
 import { Note, Type } from "@prisma/client";
 import { NoteBody } from "../interfaces/Note";
 
-const signToken = (id: string, email: string) =>
-    jwt.sign({ id, email }, JWT_SECRET_KEY, { expiresIn: JWT_EXPIRES_IN });
+// const signToken = (id: string, email: string) =>
+//     jwt.sign({ id, email }, ACCESS_TOKEN_SECRET_KEY, { expiresIn: JWT_EXPIRES_IN });
 
 const hashPassword = (password: string) => {
     return bcrypt.hash(password, parseInt(process.env.SALT as string));
@@ -27,8 +29,7 @@ export async function createUser(userInput: any) {
         })
 
         if (user) {
-            const token = signToken(user.id, user.email)
-            return { user, token }
+            return user
         }
 
         return null
@@ -74,7 +75,18 @@ export async function loginUser(email: string, password: string) {
         const user = await findUserByEmail(email)
 
         if (user && await bcrypt.compare(password, user.hashedPassword)) {
-            return signToken(user.id, user.email)
+            const ACCESS_TOKEN = jwt.sign(
+                { id: user.id, email: user.email },
+                ACCESS_TOKEN_SECRET_KEY,
+                { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
+            )
+            const REFRESH_TOKEN = jwt.sign(
+                { id: user.id, email: user.email },
+                REFRESH_TOKEN_SECRET_KEY,
+                { expiresIn: REFRESH_TOKEN_EXPIRES_IN }
+            )
+
+            return { ACCESS_TOKEN, REFRESH_TOKEN }
         }
 
         return null

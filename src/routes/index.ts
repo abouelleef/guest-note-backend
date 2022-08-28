@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import notesRouter from './notes.routes';
+import authRouter from './auth.routes';
 import usersRouter from './users.routes';
 
 const indexRouter = Router();
 
-indexRouter.use('/notes', notesRouter);
+indexRouter.use('/auth', authRouter);
 indexRouter.use('/users', usersRouter);
 
 

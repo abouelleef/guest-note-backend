@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/appError';
 
-import { JWT_SECRET_KEY } from "../config/config"
+import { ACCESS_TOKEN_SECRET_KEY } from "../config/config"
 
 export interface CustomRequest extends Request {
   user?: {
@@ -32,7 +32,7 @@ export const protect = asyncHandler(
 
     // Verify JWT
 
-    const decoded = jwt.verify(token, JWT_SECRET_KEY) as jwt.JwtPayload;
+    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET_KEY) as jwt.JwtPayload;
     console.log(decoded);
 
     req.user = { id: decoded.id, email: decoded.email };
@@ -46,7 +46,7 @@ export const currentUser = asyncHandler(
     if (req.user?.id.toString() !== req.params.id) {
       return next(
         new AppError(
-          'You are not authorized. Admin access only',
+          'You are not authorized.',
           StatusCodes.UNAUTHORIZED
         )
       );

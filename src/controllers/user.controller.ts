@@ -10,57 +10,12 @@ import { Note, User } from '@prisma/client';
 import webpush from "web-push"
 import { WEB_PUSH_EMAIL, WEB_PUSH_PRIVATE_KEY, WEB_PUSH_PUBLIC_KEY } from '../config/config'
 
-// const vapidKeys = {
-//     publicKey: WEB_PUSH_PUBLIC_KEY,
-//     privateKey: WEB_PUSH_PRAIVATE_KEY,
-// }
 
 webpush.setVapidDetails(
     `mailto:${WEB_PUSH_EMAIL}`,
     WEB_PUSH_PUBLIC_KEY,
     WEB_PUSH_PRIVATE_KEY
 );
-
-export const registerUser = asyncHandler(async (req, res, next) => {
-    let userWithToken = await createUser({ ...req.body })
-    if (!userWithToken) {
-        return next(new AppError("User cannot be created", StatusCodes.BAD_REQUEST))
-    }
-    console.log(req.file, "🎈🎈")
-    console.log(process.cwd())
-
-    if (req.file) {
-
-        const ext = req.file.path.split(".").at(-1)
-
-        const profile = `${userWithToken.user.id}.${ext}`
-
-        await fs.move(req.file.path, `${process.cwd()}\\public\\images\\profile\\${profile}`);
-        (userWithToken.user as User | null) = await updateUserProfile(userWithToken.user.id, profile)
-    }
-
-    res.status(StatusCodes.CREATED).json({
-        message: "Success",
-        data: { ...userWithToken }
-    })
-
-})
-
-export const loginUserController = asyncHandler(async (req, res, next) => {
-
-    const { email, password } = req.body
-    const token = await loginUser(email, password)
-    if (!token) {
-
-        return next(new AppError("Incorrect email or password", StatusCodes.UNAUTHORIZED))
-    }
-
-    res.status(StatusCodes.CREATED).json({
-        message: "Success",
-        data: { token }
-    })
-
-})
 
 export const sendNoteController = asyncHandler(async (req, res, next) => {
 
